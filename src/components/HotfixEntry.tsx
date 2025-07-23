@@ -4,7 +4,7 @@ import { HotfixSetupForm } from "./HotfixSetupForm";
 
 export function HotfixEntry() {
   const [version, setVersion] = useState<string>("");
-  const [project, setProject] = useState<"hartland_project" | "drive_project">("");
+  const [project, setProject] = useState<"hartland_project" | "drive_project" | "">("");
 
   function handleSetupSubmit(values: { version: string; project: string }) {
     setVersion(values.version);
