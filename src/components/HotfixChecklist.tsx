@@ -16,9 +16,15 @@ interface Preferences {
 }
 
 const PROJECTS_NAMES = {
-  hartland_project: { name: "Hartland", release_log_url: "https://3.basecamp.com/3081685/buckets/17614948/documents/5373571534" },
-  drive_project: { name: "Drive Portal", release_log_url: "https://3.basecamp.com/3081685/buckets/17658152/documents/2790215992" },
-}
+  hartland_project: {
+    name: "Hartland",
+    release_log_url: "https://3.basecamp.com/3081685/buckets/17614948/documents/5373571534",
+  },
+  drive_project: {
+    name: "Drive Portal",
+    release_log_url: "https://3.basecamp.com/3081685/buckets/17658152/documents/2790215992",
+  },
+};
 
 export function HotfixChecklist({ version, project }: InputParams) {
   const preferences = getPreferenceValues<Preferences>();
@@ -53,12 +59,12 @@ export function HotfixChecklist({ version, project }: InputParams) {
       `sed -i '' -E "s/\\"version\\": \\"[^\\"]+\\"/\\"version\\": \\"${version}\\"/" ${preferences.hartland_project}/package.json`,
       `sed -i '' -E "s/Current version: [0-9]+\\.[0-9]+\\.[0-9]+/Current version: ${version}/" ${preferences.hartland_project}/README.md`,
       `sed -i '' -E "s/v[0-9]+\\.[0-9]+\\.[0-9]+/v${version}/" ${preferences.hartland_project}/app/frontend/Shared/Sidebar.vue`,
-      `git add . && git commit -m "chore: bump versión"`
-    ].join(' && '),
+      `git add . && git commit -m "chore: bump versión"`,
+    ].join(" && "),
     drive_project: [
       `sed -i '' -E "s/\\"version\\": \\"[^\\"]+\\"/\\"version\\": \\"${version}\\"/" ${preferences.drive_project}/package.json`,
       `echo "Current version: ${version}"`,
-    ].join(' && '),
+    ].join(" && "),
   };
 
   const projectTitle = PROJECTS_NAMES[project].name.toUpperCase() || "Proyecto Desconocido";
@@ -78,8 +84,8 @@ export function HotfixChecklist({ version, project }: InputParams) {
           `cd ${preferences[project]} && git switch main && git pull && git checkout -b hotfix/${version} && git push -u origin hotfix/${version}`,
           {
             success: `Rama hotfix/${version} creada y subida a Github.`,
-            error: `No se pudo crear la rama hotfix/${version}. Asegúrate de que estás en la rama main y que tienes permisos para crear ramas.`
-          }
+            error: `No se pudo crear la rama hotfix/${version}. Asegúrate de que estás en la rama main y que tienes permisos para crear ramas.`,
+          },
         ),
     },
     {
@@ -102,87 +108,84 @@ export function HotfixChecklist({ version, project }: InputParams) {
       id: 6,
       title: "Actualizar versión local",
       description: `**${projectTitle}**  \f\f Se actualiza el numero de la version y se hace bump commit.`,
-      action: () => runScript(`cd ${preferences[project]} && ${PROJECT_UPDATE_SCRIPTS[project]}`,
-        {
+      action: () =>
+        runScript(`cd ${preferences[project]} && ${PROJECT_UPDATE_SCRIPTS[project]}`, {
           success: `Versión local actualizada a ${version}.`,
-          error: `No se pudo actualizar la versión local.`
-        }
-      ),
+          error: `No se pudo actualizar la versión local.`,
+        }),
     },
     {
       id: 7,
       title: "Subir version a Github",
       description: `**${projectTitle}**  \f\f Se actualiza el numero de la version y se hace bump commit.`,
-      action: () => runScript(`cd ${preferences[project]} && git push origin hotfix/${version}`, {
-        success: `Versión ${version} subida a Github.`,
-        error: `No se pudo subir la versión ${version} a Github.`
-      }),
+      action: () =>
+        runScript(`cd ${preferences[project]} && git push origin hotfix/${version}`, {
+          success: `Versión ${version} subida a Github.`,
+          error: `No se pudo subir la versión ${version} a Github.`,
+        }),
     },
     {
       id: 8,
-      title: "Merge en main y push",
-      description: `**${projectTitle}**  \f\fSe realiza el merge de la rama hotfix/${version} en main y se hace push.`,
-      action: () => runScript(`cd ${preferences[project]} && git switch main && git merge --no-ff hotfix/${version}`,
-        {
+      title: "Merge en main",
+      description: `**${projectTitle}**  \f\fSe realiza el merge de la rama hotfix/${version} en main.`,
+      action: () =>
+        runScript(`cd ${preferences[project]} && git switch main && git merge --no-ff hotfix/${version}`, {
           success: `Rama hotfix/${version} mergeada en main.`,
-          error: `No se pudo mergear la rama hotfix/${version} en main.`
-        }
-      ),
+          error: `No se pudo mergear la rama hotfix/${version} en main.`,
+        }),
     },
     {
       id: 9,
       title: "Realizar Push a Main",
       description: `**${projectTitle}**  \f\fSe hace push a la rama main con los cambios.`,
-      action: () => runScript(`cd ${preferences[project]} && git push origin main`,
-        {
+      action: () =>
+        runScript(`cd ${preferences[project]} && git push origin main`, {
           success: `Cambios subidos a la rama main remota.`,
-          error: `No se pudieron subir los cambios a la rama main.`
-        }
-      ),
+          error: `No se pudieron subir los cambios a la rama main.`,
+        }),
     },
     {
       id: 10,
       title: "Crear git tag",
       description: `**${projectTitle}**  \f\fSe crea un git tag v${version} en la rama hotfix/${version}.`,
-      action: () => runScript(`cd ${preferences[project]} && git tag v${version}`,
-        {
+      action: () =>
+        runScript(`cd ${preferences[project]} && git tag v${version}`, {
           success: `Git tag v${version} creado en la rama hotfix/${version}.`,
-          error: `No se pudo crear el git tag v${version}.`
-        }
-      ),
+          error: `No se pudo crear el git tag v${version}.`,
+        }),
     },
     {
       id: 11,
       title: "Subir git tag",
       description: `**${projectTitle}**  \f\f Se sube el git tag v${version} al repositorio remoto.`,
-      action: () => runScript(`cd ${preferences[project]} && git push origin v${version}`,
-        {
+      action: () =>
+        runScript(`cd ${preferences[project]} && git push origin v${version}`, {
           success: `Git tag v${version} subido al repositorio remoto.`,
-          error: `No se pudo subir el git tag v${version} al repositorio remoto.`
-        }
-      ),
+          error: `No se pudo subir el git tag v${version} al repositorio remoto.`,
+        }),
     },
     {
       id: 12,
       title: "Merge en develop",
       description: `**${projectTitle}**  \f\f Se realiza el merge de la rama hotfix/${version} en develop y se hace push.`,
-      action: () => runScript(`cd ${preferences[project]} && git switch develop && git pull && git merge --no-ff hotfix/${version}`,
-        {
-          success: `Rama hotfix/${version} mergeada en develop.`,
-          error: `No se pudo mergear la rama hotfix/${version} en develop.`
-        }
-      ),
+      action: () =>
+        runScript(
+          `cd ${preferences[project]} && git switch develop && git pull && git merge --no-ff hotfix/${version}`,
+          {
+            success: `Rama hotfix/${version} mergeada en develop.`,
+            error: `No se pudo mergear la rama hotfix/${version} en develop.`,
+          },
+        ),
     },
     {
       id: 13,
       title: "Realizar Push a develop",
       description: `**${projectTitle}**  \f\f Se hace push a la rama develop con los cambios.`,
-      action: () => runScript(`cd ${preferences[project]} && git push`,
-        {
+      action: () =>
+        runScript(`cd ${preferences[project]} && git push`, {
           success: `Cambios subidos a la rama develop remota.`,
-          error: `No se pudieron subir los cambios a la rama develop.`
-        }
-      ),
+          error: `No se pudieron subir los cambios a la rama develop.`,
+        }),
     },
     {
       id: 14,
@@ -193,7 +196,7 @@ export function HotfixChecklist({ version, project }: InputParams) {
       id: 15,
       title: "Actualizar release log",
       description: `**${projectTitle}**  \f\fActualizar el release log en Basecamp. [${PROJECTS_NAMES[project].name} release log](${PROJECTS_NAMES[project].release_log_url})`,
-    }
+    },
   ];
 
   return (
@@ -216,12 +219,7 @@ export function HotfixChecklist({ version, project }: InputParams) {
                   }}
                 />
               )}
-              {!step.action && (
-                <Action
-                  title="Marcar Como Completado"
-                  onAction={() => markStep(step.id)}
-                />
-              )}
+              {!step.action && <Action title="Marcar Como Completado" onAction={() => markStep(step.id)} />}
             </ActionPanel>
           }
         />

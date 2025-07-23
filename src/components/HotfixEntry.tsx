@@ -12,14 +12,8 @@ export function HotfixEntry() {
   }
 
   if (!version || !project) {
-    return (
-      <HotfixSetupForm
-        project_default={project}
-        version_default={version}
-        onSubmit={handleSetupSubmit}
-      />
-    );
+    return <HotfixSetupForm project_default={project} version_default={version} onSubmit={handleSetupSubmit} />;
   }
 
-  return (<HotfixChecklist version={version} project={project} />);
+  return <HotfixChecklist version={version} project={project} />;
 }

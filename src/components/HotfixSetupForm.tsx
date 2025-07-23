@@ -6,7 +6,15 @@ interface InputParams {
   project: string;
 }
 
-export function HotfixSetupForm({ project_default, version_default, onSubmit }: { project_default: string; version_default: string; onSubmit: (values: InputParams) => void }) {
+export function HotfixSetupForm({
+  project_default,
+  version_default,
+  onSubmit,
+}: {
+  project_default: string;
+  version_default: string;
+  onSubmit: (values: InputParams) => void;
+}) {
   const [project, setProject] = useState(project_default);
   const [version, setVersion] = useState(version_default);
 
@@ -32,7 +40,13 @@ export function HotfixSetupForm({ project_default, version_default, onSubmit }: 
         <Form.Dropdown.Item value="drive_project" title="Drive Portal" />
       </Form.Dropdown>
 
-      <Form.TextField id="version" title="Nueva versión" value={version} placeholder="Ejemplo: 1.2.3" onChange={setVersion} />
+      <Form.TextField
+        id="version"
+        title="Nueva versión"
+        value={version}
+        placeholder="Ejemplo: 1.2.3"
+        onChange={setVersion}
+      />
     </Form>
   );
 }
