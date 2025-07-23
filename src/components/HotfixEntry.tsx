@@ -3,8 +3,8 @@ import { HotfixChecklist } from "./HotfixChecklist";
 import { HotfixSetupForm } from "./HotfixSetupForm";
 
 export function HotfixEntry() {
-  const [version, setVersion] = useState<string>("1.3.6");
-  const [project, setProject] = useState<"hartland_project" | "drive_project">("hartland_project");
+  const [version, setVersion] = useState<string>("");
+  const [project, setProject] = useState<"hartland_project" | "drive_project">("");
 
   function handleSetupSubmit(values: { version: string; project: string }) {
     setVersion(values.version);
