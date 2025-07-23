@@ -91,7 +91,8 @@ export function HotfixChecklist({ version, project }: InputParams) {
     ].join(" && "),
   };
 
-  const projectTitle: string = PROJECTS_NAMES[project as keyof ProjectNames].name.toUpperCase() || "Proyecto Desconocido";
+  const projectTitle: string =
+    PROJECTS_NAMES[project as keyof ProjectNames].name.toUpperCase() || "Proyecto Desconocido";
 
   const steps: Step[] = [
     {

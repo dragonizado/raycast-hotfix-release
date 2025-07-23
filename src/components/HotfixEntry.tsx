@@ -3,7 +3,7 @@ import { HotfixChecklist } from "./HotfixChecklist";
 import { HotfixSetupForm } from "./HotfixSetupForm";
 
 const allowedProjects = ["hartland_project", "drive_project", ""] as const;
-type ProjectType = typeof allowedProjects[number];
+type ProjectType = (typeof allowedProjects)[number];
 
 export function HotfixEntry() {
   const [version, setVersion] = useState<string>("");
