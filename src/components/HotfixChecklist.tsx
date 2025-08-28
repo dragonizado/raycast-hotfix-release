@@ -86,8 +86,9 @@ export function HotfixChecklist({ version, project }: InputParams) {
       `git add . && git commit -m "chore: bump versión"`,
     ].join(" && "),
     drive_project: [
+      `git switch hotfix/${version} && git pull origin hotfix/${version}`,
       `sed -i '' -E "s/\\"version\\": \\"[^\\"]+\\"/\\"version\\": \\"${version}\\"/" ${preferences.drive_project}/package.json`,
-      `echo "Current version: ${version}"`,
+      `git add . && git commit -m "chore: bump versión"`,
     ].join(" && "),
   };
 
