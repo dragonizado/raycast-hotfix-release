@@ -4,19 +4,23 @@ import { useState } from "react";
 interface InputParams {
   version: string;
   project: string;
+  descripcion: string;
 }
 
 export function HotfixSetupForm({
   project_default,
   version_default,
+  descripcion_default,
   onSubmit,
 }: {
   project_default: string;
   version_default: string;
+  descripcion_default: string;
   onSubmit: (values: InputParams) => void;
 }) {
   const [project, setProject] = useState(project_default);
   const [version, setVersion] = useState(version_default);
+  const [descripcion, setDescripcion] = useState(descripcion_default);
 
   return (
     <Form
@@ -26,8 +30,8 @@ export function HotfixSetupForm({
           <Action
             title="Continuar"
             onAction={() => {
-              if (version && project) {
-                onSubmit({ version, project });
+              if (version && project && descripcion) {
+                onSubmit({ version, project, descripcion });
               }
             }}
           />
@@ -46,6 +50,14 @@ export function HotfixSetupForm({
         value={version}
         placeholder="Ejemplo: 1.2.3"
         onChange={setVersion}
+      />
+
+      <Form.TextField
+        id="descripcion"
+        title="Descripción rama del hotfix"
+        value={descripcion}
+        placeholder="Ejemplo: descripcion del bug"
+        onChange={setDescripcion}
       />
     </Form>
   );

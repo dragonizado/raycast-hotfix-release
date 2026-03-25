@@ -7,10 +7,13 @@ type ProjectType = (typeof allowedProjects)[number];
 
 export function HotfixEntry() {
   const [version, setVersion] = useState<string>("");
+  const [descripcion, setDescripcion] = useState<string>("");
   const [project, setProject] = useState<ProjectType>("");
 
-  function handleSetupSubmit(values: { version: string; project: string }) {
+  function handleSetupSubmit(values: { version: string; project: string; descripcion: string }) {
     setVersion(values.version);
+    setDescripcion(values.descripcion);
+    console.log("values", values);
     if (allowedProjects.includes(values.project as ProjectType)) {
       setProject(values.project as ProjectType);
     } else {
@@ -19,8 +22,8 @@ export function HotfixEntry() {
   }
 
   if (!version || !project) {
-    return <HotfixSetupForm project_default={project} version_default={version} onSubmit={handleSetupSubmit} />;
+    return <HotfixSetupForm project_default={project} version_default={version} descripcion_default={descripcion} onSubmit={handleSetupSubmit} />;
   }
 
-  return <HotfixChecklist version={version} project={project} />;
+  return <HotfixChecklist version={version} project={project} descripcion={descripcion} />;
 }
