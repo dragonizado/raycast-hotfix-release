@@ -1,5 +1,5 @@
-import { List, Icon, ActionPanel, Action, getPreferenceValues, showToast, Toast } from "@raycast/api";
-import { useState } from "react";
+import { List, Icon, ActionPanel, Action, getPreferenceValues, showToast, Toast, LocalStorage, confirmAlert, Alert } from "@raycast/api";
+import { useState, useEffect } from "react";
 import { exec } from "child_process";
 import util from "util";
 
@@ -9,6 +9,7 @@ interface InputParams {
   version: string;
   project: string;
   descripcion: string;
+  onFinalize?: () => void;
 }
 
 interface Preferences {
@@ -55,12 +56,32 @@ function parametrizarDescripcion(descripcion: string) {
   return descripcion?.replace(/ /g, "-").toLowerCase() || "No description";
 }
 
-export function HotfixChecklist({ version, project, descripcion }: InputParams) {
+const FINALIZE_STEP_ID = 18;
+
+export function HotfixChecklist({ version, project, descripcion, onFinalize }: InputParams) {
   const preferences = getPreferenceValues<Preferences>();
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const markStep = (id: number) => {
-    setCompletedSteps((prev) => [...new Set([...prev, id])]);
+  const storageKey = `hotfix-${project}-${version}`;
+
+  useEffect(() => {
+    LocalStorage.getItem<string>(storageKey).then((data) => {
+      if (data) {
+        try {
+          setCompletedSteps(JSON.parse(data));
+        } catch {
+          /* ignore corrupted data */
+        }
+      }
+      setIsLoading(false);
+    });
+  }, []);
+
+  const markStep = async (id: number) => {
+    const updated = [...new Set([...completedSteps, id])];
+    setCompletedSteps(updated);
+    await LocalStorage.setItem(storageKey, JSON.stringify(updated));
   };
 
   const runScript = async (cmd: string, { success, error }: { success: string; error: string }) => {
@@ -264,11 +285,17 @@ export function HotfixChecklist({ version, project, descripcion }: InputParams) 
       title: "Actualizar release log",
       description: `**${projectTitle}**  \f\fActualizar el release log en Basecamp. [${PROJECTS_NAMES[project as keyof typeof PROJECTS_NAMES].name} release log](${PROJECTS_NAMES[project as keyof typeof PROJECTS_NAMES].release_log_url})`,
     },
+    {
+      id: FINALIZE_STEP_ID,
+      title: "Finalizar tareas",
+      description: `**${projectTitle}**  \f\fAl marcar este paso se dará por concluido el hotfix v${version} y se eliminará el progreso guardado.`,
+    },
   ];
 
   return (
     <List
       isShowingDetail
+      isLoading={isLoading}
       navigationTitle={`Checklist Hotfix v${version} for ${PROJECTS_NAMES[project as keyof typeof PROJECTS_NAMES].name}`}
     >
       {steps.map((step) => (
@@ -280,7 +307,34 @@ export function HotfixChecklist({ version, project, descripcion }: InputParams) 
           detail={<List.Item.Detail markdown={step.description || ""} />}
           actions={
             <ActionPanel>
-              {step.action && (
+              {step.id === FINALIZE_STEP_ID && (
+                <Action
+                  title="Finalizar Hotfix"
+                  style={Action.Style.Destructive}
+                  onAction={async () => {
+                    if (
+                      await confirmAlert({
+                        title: "¿Finalizar tareas?",
+                        message: "Se eliminará el progreso guardado de este hotfix. Esta acción no se puede deshacer.",
+                        primaryAction: {
+                          title: "Finalizar",
+                          style: Alert.ActionStyle.Destructive,
+                        },
+                      })
+                    ) {
+                      await LocalStorage.removeItem(storageKey);
+                      setCompletedSteps([]);
+                      showToast({
+                        style: Toast.Style.Success,
+                        title: "Hotfix finalizado",
+                        message: "El progreso ha sido eliminado.",
+                      });
+                      onFinalize?.();
+                    }
+                  }}
+                />
+              )}
+              {step.id !== FINALIZE_STEP_ID && step.action && (
                 <Action
                   title="Ejecutar Paso"
                   onAction={async () => {
@@ -289,7 +343,9 @@ export function HotfixChecklist({ version, project, descripcion }: InputParams) 
                   }}
                 />
               )}
-              {!step.action && <Action title="Marcar Como Completado" onAction={() => markStep(step.id)} />}
+              {step.id !== FINALIZE_STEP_ID && !step.action && (
+                <Action title="Marcar Como Completado" onAction={() => markStep(step.id)} />
+              )}
             </ActionPanel>
           }
         />
