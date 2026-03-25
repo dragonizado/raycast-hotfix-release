@@ -1,4 +1,15 @@
-import { List, Icon, ActionPanel, Action, getPreferenceValues, showToast, Toast, LocalStorage, confirmAlert, Alert } from "@raycast/api";
+import {
+  List,
+  Icon,
+  ActionPanel,
+  Action,
+  getPreferenceValues,
+  showToast,
+  Toast,
+  LocalStorage,
+  confirmAlert,
+  Alert,
+} from "@raycast/api";
 import { useState, useEffect } from "react";
 import { exec } from "child_process";
 import util from "util";
@@ -142,7 +153,7 @@ export function HotfixChecklist({ version, project, descripcion, onFinalize }: I
     {
       id: 2,
       title: "Aplicar corrección",
-      description: `**${projectTitle}**  \f\fImplementar los cambios necesarios para corregir el bug. Mantener los commits enfocados y con mensajes claros.`
+      description: `**${projectTitle}**  \f\fImplementar los cambios necesarios para corregir el bug. Mantener los commits enfocados y con mensajes claros.`,
     },
     {
       id: 3,

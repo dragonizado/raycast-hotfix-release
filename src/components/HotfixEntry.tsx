@@ -46,7 +46,14 @@ export function HotfixEntry() {
   }
 
   if (!version || !project) {
-    return <HotfixSetupForm project_default={project} version_default={version} descripcion_default={descripcion} onSubmit={handleSetupSubmit} />;
+    return (
+      <HotfixSetupForm
+        project_default={project}
+        version_default={version}
+        descripcion_default={descripcion}
+        onSubmit={handleSetupSubmit}
+      />
+    );
   }
 
   async function resetHotfix() {
